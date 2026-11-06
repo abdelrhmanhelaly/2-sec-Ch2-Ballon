@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>كيمياء الثانوية - الباب الثاني: بنية الذرة</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #0b1329;
+      --card-bg: #111b36;
+      --card-border: #1c3260;
+      --text-main: #ffffff;
+      --text-sub: #94a3b8;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --balloon-border: rgba(255, 255, 255, 0.4);
+    }
+
+    body.light-mode {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --card-border: #cbd5e1;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --balloon-border: rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.3s;
+    }
+
+    #game-container {
+      width: 100%;
+      max-width: 480px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      background: var(--bg-color);
+      box-shadow: 0 0 25px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--card-border);
+      font-size: 13px;
+      font-weight: bold;
+      z-index: 10;
+    }
+
+    .top-bar-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-badge {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid var(--card-border);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    body.light-mode .btn-badge {
+      background: #e2e8f0;
+      color: #0369a1;
+    }
+
+    .btn-pause {
+      background: #eab308;
+      color: #000;
+      font-weight: bold;
+      border-color: #ca8a04;
+    }
+
+    .btn-pause.paused {
+      background: #22c55e;
+      color: #fff;
+      border-color: #16a34a;
+    }
+
+    .designer-banner {
+      background: rgba(2, 132, 199, 0.1);
+      border: 1px solid var(--accent);
+      color: #38bdf8;
+      text-align: center;
+      padding: 5px;
+      font-size: 12.5px;
+      font-weight: bold;
+      margin: 4px 10px;
+      border-radius: 8px;
+      z-index: 10;
+    }
+
+    body.light-mode .designer-banner {
+      color: #0284c7;
+      background: #e0f2fe;
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      padding: 4px 10px;
+      z-index: 10;
+    }
+
+    .stat-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      text-align: center;
+      padding: 4px 2px;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-sub);
+      margin-bottom: 2px;
+    }
+
+    .stat-val {
+      font-size: 12px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    .btn-skip {
+      background: #ea580c;
+      color: white;
+      border: none;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-size: 10.5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .question-box {
+      background: var(--card-bg);
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      margin: 4px 10px;
+      padding: 8px 12px;
+      text-align: center;
+      font-size: 13.5px;
+      font-weight: 600;
+      line-height: 1.45;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      z-index: 10;
+      transition: border-color 0.3s;
+    }
+
+    .question-badge {
+      position: absolute;
+      top: -9px;
+      left: 10px;
+      background: #16a34a;
+      color: white;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    #game-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 100px;
+      height: 124px;
+      border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 11.5px;
+      padding: 6px;
+      cursor: pointer;
+      box-shadow: inset -5px -5px 12px rgba(0,0,0,0.3), inset 6px 6px 12px rgba(255,255,255,0.4), 0 8px 15px rgba(0,0,0,0.3);
+      border: 1px solid var(--balloon-border);
+      touch-action: manipulation;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
+    }
+
+    .balloon::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 7px solid currentColor;
+    }
+
+    .balloon::before {
+      content: "";
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      width: 2px;
+      height: 12px;
+      background: #94a3b8;
+    }
+
+    .balloon-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      width: 100%;
+      pointer-events: none;
+      line-height: 1.25;
+    }
+
+    .chem-formula {
+      direction: ltr !important;
+      unicode-bidi: isolate !important;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      font-weight: bold;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      display: inline-block;
+    }
+
+    .balloon.highlight-correct {
+      border: 4px solid #22c55e !important;
+      box-shadow: 0 0 30px #22c55e, inset 0 0 12px #ffffff !important;
+      z-index: 40 !important;
+      animation: pulse-correct 0.6s infinite alternate;
+    }
+
+    .balloon.center-focus {
+      position: absolute !important;
+      top: 40% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) scale(1.35) !important;
+      z-index: 50 !important;
+    }
+
+    .balloon.fade-out {
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
+    @keyframes pulse-correct {
+      0% { box-shadow: 0 0 15px #22c55e; }
+      100% { box-shadow: 0 0 35px #22c55e, inset 0 0 10px #ffffff; }
+    }
+
+    .screen-overlay {
+      position: absolute;
+      inset: 0;
+      background: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 22px 18px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #38bdf8;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text-main);
+      font-size: 14px;
+      margin: 10px 0;
+      outline: none;
+      text-align: center;
+    }
+
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0;
+      font-size: 13px;
+    }
+
+    .option-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-opt {
+      background: #1e293b;
+      color: var(--text-sub);
+      border: 1px solid var(--card-border);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .btn-opt.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .btn-action {
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-action:hover { background: #0369a1; }
+    .btn-success { background: #16a34a; }
+    .btn-success:hover { background: #15803d; }
+    .btn-purple { background: #7c3aed; }
+    .btn-purple:hover { background: #6d28d9; }
+    .btn-orange { background: #ea580c; }
+    .btn-orange:hover { background: #c2410c; }
+
+    .loader-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: #38bdf8;
+      border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes pulse {
+      0% { opacity: 0.2; transform: scale(0.8); }
+      100% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .advice-box {
+      border-right: 4px solid #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-top: 14px;
+      color: #bae6fd;
+    }
+
+    .hidden { display: none !important; }
+
+    .footer-credits {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    sub, sup {
+      font-size: 0.72em;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+    }
+    sub { bottom: -0.25em; }
+    sup { top: -0.45em; }
+  </style>
+</head>
+<body>
+
+<div id="game-container">
+
+  <div class="top-bar">
+    <div>🧪 بنية الذرة - 2 ثانوي</div>
+    <div class="top-bar-controls">
+      <button class="btn-badge btn-pause" id="pause-btn" onclick="togglePause()">⏸️ إيقاف</button>
+      <button class="btn-badge" id="theme-btn" onclick="toggleTheme()">☀️ نهار</button>
+      <button class="btn-badge" id="speed-indicator">⚡ سرعة: هادئ جداً</button>
+    </div>
+  </div>
+
+  <div class="designer-banner">
+    مصمم اللعبة: أ/ عبد الرحمن عبد الله - 01021779644
+  </div>
+
+  <div class="stats-bar" id="stats-bar">
+    <div class="stat-box">
+      <div class="stat-label">المستوى</div>
+      <div class="stat-val" id="level-display">1 / 3</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">النقاط</div>
+      <div class="stat-val" id="score-display">0</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">القلوب (<span id="hearts-count-num">10</span>/12)</div>
+      <div class="stat-val" id="hearts-display" style="font-size: 9.5px; letter-spacing: -1px;">❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">تخطي (<span id="skip-num">3</span>)</div>
+      <button class="btn-skip" id="skip-btn" onclick="skipQuestion()">تخطي</button>
+    </div>
+  </div>
+
+  <div class="question-box" id="question-box">
+    <div class="question-badge" id="q-number-badge">سؤال 1 / 10</div>
+    <div id="question-text">نص السؤال يظهر هنا...</div>
+  </div>
+
+  <div id="game-stage"></div>
+
+  <!-- شاشة البداية -->
+  <div class="screen-overlay" id="start-screen">
+    <div class="card">
+      <h2>مرحباً بك يا بطل! 👋</h2>
+      <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">
+        تحدي بنية الذرة (الباب الثاني) - بدون تايمر وبحركة هادئة!
+      </p>
+
+      <input type="text" id="player-name-input" class="input-text" placeholder="اكتب اسمك هنا..." value="">
+
+      <div class="settings-row">
+        <span>مظهر الشاشة:</span>
+        <div class="option-group">
+          <button class="btn-opt active" id="mode-dark-btn" onclick="setAppTheme('dark')">داكن</button>
+          <button class="btn-opt" id="mode-light-btn" onclick="setAppTheme('light')">أبيض</button>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <span>السرعة:</span>
+        <div class="option-group">
+          <button class="btn-opt active" id="speed-slow-btn" onclick="setGameSpeed('slow')">هادئ جداً</button>
+          <button class="btn-opt" id="speed-med-btn" onclick="setGameSpeed('med')">متوسط</button>
+          <button class="btn-opt" id="speed-fast-btn" onclick="setGameSpeed('fast')">سريع</button>
+        </div>
+      </div>
+
+      <div style="font-size: 11px; color: #38bdf8; margin: 10px 0; text-align: right; line-height: 1.5;">
+        * اللعبة <strong>3 مستويات</strong> (10 أسئلة عشوائية لكل مستوى).<br>
+        * تم <strong>إلغاء التايمر</strong> للتركيز والحل بروية.<br>
+        * يمكنك إيقاف واستئناف اللعبة بأي وقت عبر زر <strong>⏸️ إيقاف</strong>.<br>
+        * خيارات محايدة وموجزة بدون أي تلميحات بالحل.
+      </div>
+
+      <button class="btn-action" onclick="showPreloaderScreen()">ابدأ التحدي 🚀</button>
+      
+      <div class="footer-credits">
+        تصميم: أ/ عبد الرحمن عبد الله | 01021779644
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة الانتظار والنصيحة -->
+  <div class="screen-overlay hidden" id="prep-screen">
+    <div class="card">
+      <h3 style="color: #38bdf8;" id="prep-title">المستوى يبدأ الآن...</h3>
+      <div class="loader-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+      <div class="advice-box" id="advice-text">
+        "التواضع عند الفهم وحسن الخلق مع الزملاء والمعلمين زكاة العلم الحقيقية."
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة اجتياز المستوى (بين المستويات) -->
+  <div class="screen-overlay hidden" id="level-passed-screen">
+    <div class="card" id="level-passed-card">
+      <h2 style="color: #16a34a;" id="level-passed-title">أحسنت يا بطل! 🎉</h2>
+      <p style="font-size: 14px; color: var(--text-main); margin: 8px 0;" id="level-passed-msg">
+        تم إكمال المستوى بنجاح!
+      </p>
+      <div style="font-size: 15px; margin: 10px 0;">
+        نقاطك الحالية: <span style="font-size: 22px; font-weight: bold; color: #eab308;" id="level-passed-score">0</span>
+      </div>
+
+      <button class="btn-action btn-success" id="next-level-btn" onclick="proceedToNextLevel()">الانتقال للمستوى التالي 🚀</button>
+      <button class="btn-action btn-orange" onclick="replayCurrentLevel()">🔄 إعادة نفس المستوى مرة أخرى</button>
+      <button class="btn-action" style="background:#0284c7;" onclick="shareLevelScore()">📲 مشاركة النتيجة الحالية</button>
+      <button class="btn-action btn-purple" onclick="captureLevelScreenshot()">📸 حفظ لقطة الشاشة للمستوى</button>
+      
+      <div class="footer-credits" style="margin-top: 14px; border-top: 1px dashed var(--card-border); padding-top: 6px;">
+        مصمم اللعبة: أ/ عبد الرحمن عبد الله - 01021779644
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة النهاية والنتيجة العامة -->
+  <div class="screen-overlay hidden" id="end-screen">
+    <div class="card" id="end-card">
+      <h2 style="color: #ef4444;" id="end-title">انتهت الجولة!</h2>
+      <h3 style="color: #38bdf8; font-size: 15px; margin-bottom: 12px; line-height: 1.5;" id="end-praise">أحسنت يا بطل! 👏</h3>
+      
+      <div style="font-size: 14px; margin: 12px 0;">
+        مجموع درجاتك النهائي: <span style="font-size: 24px; font-weight: bold; color: #eab308;" id="final-score">0</span> من 300
+      </div>
+
+      <button class="btn-action btn-success" onclick="shareFinalScore()">📲 مشاركة النتيجة كرسالة / بوست</button>
+      <button class="btn-action btn-purple" onclick="captureFinalScreenshot()">📸 حفظ لقطة الشاشة على الهاتف</button>
+      <button class="btn-action" onclick="restartGame()">🔄 البدء من جديد (من المستوى الأول)</button>
+
+      <div class="footer-credits" style="margin-top: 18px; border-top: 1px dashed var(--card-border); padding-top: 8px;">
+        مصمم اللعبة: أ/ عبد الرحمن عبد الله - 01021779644
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  /* بنك الأسئلة منقح بالكامل بدون أي تلميحات أو تفسيرات داخل الخيارات */
+  const levelQuestionsBank = {
+    // المستوى الأول: الدرس الأول (تطور مفهوم بنية الذرة وبور)
+    1: [
+      { q: "استنتج طومسون أن الذرة عبارة عن كرة:", options: ["مصمتة متجانسة موجبة بها إلكترونات سالبة", "مجوفة سالبة الشحنة", "تحتوي على نواة وفراغات شاسعة", "غير متجانسة ومتباينة الكثافة"], correct: 0 },
+      { q: "العالم الذي وضع أول نموذج لتركيب الذرة على أساس تجريبي هو:", options: ["رذرفورد", "طومسون", "بور", "هايزنبرج"], correct: 0 },
+      { q: "في تجربة رذرفورد تم استخدام لوح معدني مبطن بطبقة من:", options: ["كبريتيد الخارصين", "كبريتات النحاس", "أكسيد الكالسيوم", "كلوريد الفضة"], correct: 0 },
+      { q: "السبب في اختيار كبريتيد الخارصين في تجربة رذرفورد أنه:", options: ["يظهر وميضاً عند اصطدام جسيمات ألفا به", "يمتص جسيمات ألفا تماماً", "يمنع ارتداد أشعة ألفا", "موصل قوي للشحنات الموجبة"], correct: 0 },
+      { q: "جسيمات ألفا المستخدمة في تجربة رذرفورد عبارة عن:", options: ["أنوية ذرات هيليوم موجبة", "إلكترونات سالبة الشحنة", "موجات كهرومغناطيسية", "ذرات هيدروجين متعادلة"], correct: 0 },
+      { q: "نفاذ معظم جسيمات ألفا خلال صفيحة الذهب دون انحراف أثبت أن:", options: ["الذرة معظمها فراغ", "النواة موجبة الشحنة", "كتلة الإلكترون ضئيلة جداً", "الذرة مصمتة تماماً"], correct: 0 },
+      { q: "ارتداد نسبة ضئيلة جداً من جسيمات ألفا للخلف في تجربة رذرفورد يشير إلى وجود:", options: ["النواة", "الإلكترونات", "المدارات", "السحابة الإلكترونية"], correct: 0 },
+      { q: "انحراف نسبة ضئيلة من جسيمات ألفا عن مسارها يرجع إلى:", options: ["تنافر شحنتها مع شحنة النواة الموجبة", "اصطدامها المباشر بالنواة", "انجذابها للإلكترونات السالبة", "صغر كتلة الذرة"], correct: 0 },
+      { q: "النسبة بين عدد جسيمات ألفا النافذة إلى عدد الجسيمات المرتدة تكون:", options: ["أكبر بكثير من الواحد", "مساوية للواحد", "أقل من الواحد", "تساوي صفراً"], correct: 0 },
+      { q: "شبّه رذرفورد الذرة في تكوينها بـ:", options: ["المجموعة الشمسية", "قطعة البطيخ", "كرة البلياردو", "قطرة الزيت"], correct: 0 },
+      { q: "لا يسقط الإلكترون داخل النواة في نموذج رذرفورد بسبب:", options: ["تعادل قوى التجاذب مع قوى الطرد المركزية", "انعدام قوة الجذب بينهما", "كبر حجم النواة", "وجود سحابة إلكترونية"], correct: 0 },
+      { q: "من أوجه القصور في نموذج رذرفورد للذرة أنه فشل في:", options: ["توضيح نظام دوران الإلكترونات حول النواة", "إثبات وجود شحنة موجبة في النواة", "تفسير تعادل الذرة كهربياً", "إثبات أن الذرة معظمها فراغ"], correct: 0 },
+      { q: "عند تسخين ذرات عنصر نقي في الحالة الغازية تحت ضغط منخفض ينبعث منها:", options: ["طيف انبعاث خطي", "طيف مستمر", "جسيمات ألفا", "أشعة مهبط فقط"], correct: 0 },
+      { q: "الجهاز المستخدم في فحص وتحليل الطيف الخطي للذرات هو:", options: ["المطياف", "الميكروسكوب", "أنبوب التفريغ", "الجلفانومتر"], correct: 0 },
+      { q: "الطيف الخطي لأي عنصر يعتبر خاصية أساسية ومميزة له لأنه:", options: ["لا يوجد عنصران لهما نفس العدد الذري", "يعتمد على عدد النيوترونات", "يتغير بتغير درجة الحرارة", "طيف متصل بلا فواصل"], correct: 0 },
+      { q: "يتكون الطيف الخطي المرئي لذرة الهيدروجين عند فحصه بالمطياف من:", options: ["أربعة خطوط ملونة", "ثلاثة خطوط ملونة", "سبعة خطوط ملونة", "خمسة خطوط ملونة"], correct: 0 },
+      { q: "أي الأطوال الموجية الآتية يمثل الخط الطيفي الأحمر للهيدروجين بالنانومتر؟", options: ["656 nm", "410 nm", "486 nm", "434 nm"], correct: 0 },
+      { q: "الخط الطيفي الذي يمتلك أعلى تردد وأعلى طاقة في طيف الهيدروجين المرئي لونه:", options: ["بنفسجي", "أحمر", "أخضر", "أزرق"], correct: 0 },
+      { q: "الخط الطيفي ذو أكبر طول موجي في طيف انبعاث الهيدروجين المرئي هو اللون:", options: ["الأحمر", "البنفسجي", "الأخضر", "الأزرق"], correct: 0 },
+      { q: "استحق العالم نيلز بور جائزة نوبل في الفيزياء تقديراً لـ:", options: ["تفسيره الطيف الخطي لذرة الهيدروجين", "اكتشافه جسيمات ألفا", "اكتشافه شحنة الإلكترون", "إثباته أن الذرة مصمتة"], correct: 0 },
+      { q: "المفهوم الذي أدخله بور لتحديد طاقة الإلكترونات في المستويات لأول مرة هو:", options: ["الكوانتم", "السحابة الإلكترونية", "الأوربيتال", "الغزل المغناطيسي"], correct: 0 },
+      { q: "وفقاً لنموذج بور، تعتبر الفراغات الموجودة بين مستويات الطاقة:", options: ["مناطق محرمة على الإلكترونات", "مناطق مسموحة للإلكترونات", "مناطق تتركز فيها كتلة الذرة", "ممرات حلزونية"], correct: 0 },
+      { q: "ينتقل الإلكترون من مستوى طاقة لآخر في نموذج بور عن طريق:", options: ["القفزة الكاملة", "الحركة التدريجية", "التلاشي والظهور العشوائي", "الانشطار والانقسام"], correct: 0 },
+      { q: "الذرة المستقرة هي الذرة التي:", options: ["تكون إلكتروناتها في أدنى مستويات الطاقة المتاحة", "اكتسبت كوانتم هائل من الطاقة", "فقدت جميع إلكتروناتها", "تحتوي على أوربيتالات فارغة فقط"], correct: 0 },
+      { q: "عندما يكتسب الإلكترون كوانتم مساوياً لفرق الطاقة بين مستويين فإنه:", options: ["ينتقل إلى مستوى طاقة أعلى", "يغادر الذرة تماماً", "يسقط مباشرة داخل النواة", "تتحول شحنته إلى موجبة"], correct: 0 },
+      { q: "توصف الذرة التي اكتسب إلكترونها قدراً من الطاقة بالحرارة أو التفريغ بأنها:", options: ["ذرة مثارة", "ذرة مستقرة", "أيون سالب", "ذرة متأينة"], correct: 0 },
+      { q: "يعود الإلكترون المثار إلى مستواه الأصلي فاقداً الطاقة المكتسبة على هيئة:", options: ["إشعاع ضوئي", "جسيمات مادية", "تيار شحنات كهربية", "نيوترونات حرة"], correct: 0 },
+      { q: "مقدار الطاقة المنطلقة عند عودة الإلكترون من الإثارة إلى مستواه المستقر يكون:", options: ["مساوياً للكم المكتسب", "ضعف الكم المكتسب", "نصف الكم المكتسب", "أكبر من الطاقة الممتصة"], correct: 0 },
+      { q: "كم الطاقة (الكوانتم):", options: ["لا يتجزأ ولا يتضاعف", "يمكن تجزئته لنصف أو ربع", "يزداد قيمته بين المستويات المتعاقبة", "يكون دائماً قيمة سالبة"], correct: 0 },
+      { q: "الفرق في الطاقة بين مستويات الطاقة الرئيسية بالابتعاد عن النواة:", options: ["يقل تدريجياً", "يزداد تدريجياً", "يظل ثابتاً", "يساوي دائماً صفراً"], correct: 0 },
+      { q: "أكبر فرق في الطاقة بين أي مستويين متتاليين في الذرة يكون بين المستويين:", options: ["K و L", "L و M", "M و N", "P و Q"], correct: 0 },
+      { q: "كم الطاقة اللازم لنقل الإلكترون من المستوى K إلى L مقارنة بنقله من L إلى M:", options: ["أكبر من", "أقل من", "مساوٍ له", "نصف قيمته"], correct: 0 },
+      { q: "عند انتقال إلكترون ذرة الهيدروجين المثار من المستويات العليا إلى المستوى n=1 ينتج طيف في منطقة:", options: ["الأشعة فوق البنفسجية", "الضوء المرئي", "الأشعة تحت الحمراء", "أشعة إكس"], correct: 0 },
+      { q: "تظهر خطوط الطيف المرئي الأربعة لذرة الهيدروجين عند هبوط الإلكترونات المثارة إلى المستوى:", options: ["n = 2", "n = 1", "n = 3", "n = 4"], correct: 0 },
+      { q: "عند هبوط الإلكترون المثار في ذرة الهيدروجين إلى المستوى الرئيسي الثالث n=3 فإن الطيف يقع في منطقة:", options: ["الأشعة تحت الحمراء", "الأشعة فوق البنفسجية", "الضوء المرئي", "أشعة جاما"], correct: 0 },
+      { q: "أي الانتقالات الآتية في ذرة الهيدروجين ينتج عنها أكبر انطلاق للطاقة؟", options: ["من n=2 إلى n=1", "من n=3 إلى n=2", "من n=4 إلى n=3", "من n=5 إلى n=4"], correct: 0 },
+      { q: "أي الانتقالات الآتية لإلكترون ذرة الهيدروجين ينتج عنها خط طيفي مرئي؟", options: ["من n=4 إلى n=2", "من n=3 إلى n=1", "من n=5 إلى n=3", "من n=6 إلى n=1"], correct: 0 },
+      { q: "الفراغات الفاصلة بين مستويات الطاقة المتعاقبة بالابتعاد عن النواة:", options: ["تقل", "تزداد", "تظل ثابتة", "تتضاعف"], correct: 0 },
+      { q: "أحد أهم مميزات نموذج بور أنه فسر الطيف الخطي لـ:", options: ["ذرة الهيدروجين فقط", "جميع العناصر المعروفة", "ذرة الهيليوم", "أيون الصوديوم"], correct: 0 },
+      { q: "من أوجه قصور نموذج بور أنه اعتبر الإلكترون:", options: ["جسيم مادي سالب فقط", "جسيم مادي له خواص موجية", "سحابة ثلاثية الأبعاد", "موجة نقية"], correct: 0 },
+      { q: "افترض بور إمكانية تحديد مكان وسرعة الإلكترون بدقة معاً، وقد ثبت عملياً أن هذا:", options: ["مستحيل عملياً", "صحيح تماماً", "ممكن في الذرات الكبيرة", "ينطبق على الإلكترونات السريعة"], correct: 0 },
+      { q: "افترض بور أن الذرة مسطحة لأنه اعتبر أن الإلكترون يتحرك في:", options: ["مسار دائري مستوٍ", "أبعاد فراغية ثلاثة", "سحابة كروية", "مدار حلزوني"], correct: 0 },
+      { q: "أثبتت النظريات الحديثة أن الذرة ليست مسطحة بل مجسمة ولها:", options: ["ثلاثة اتجاهات فراغية", "اتجاه فراغي واحد", "اتجاهان متقاطعان", "مسار دائري فقط"], correct: 0 },
+      { q: "إذا امتص إلكترون طاقة مقدارها 10.2 eV لينتقل من n=1 إلى n=2، فلكي يعود يفقد:", options: ["10.2 eV", "5.1 eV", "20.4 eV", "15.3 eV"], correct: 0 },
+      { q: "أي الكميات الآتية مستحيل أن يكتسبها أو يفقدها الإلكترون أثناء انتقاله؟", options: ["نصف كوانتم", "واحد كوانتم", "فرق الطاقة بين المستويين", "كم طاقة كامل"], correct: 0 },
+      { q: "طيف الانبعاث الخطي ينتج مباشرة عن:", options: ["عودة الإلكترونات المثارة لمستويات أدنى", "امتصاص الإلكترون للطاقة", "دوران الإلكترون في مداره المستقر", "خروج البروتونات من النواة"], correct: 0 },
+      { q: "بزيادة رقم مستوى الطاقة الرئيسي (n):", options: ["تزداد طاقته ويبتعد عن النواة", "تقل طاقته ويقترب من النواة", "تقل طاقته ويبتعد عن النواة", "تزداد طاقته ويقترب من النواة"], correct: 0 },
+      { q: "شحنة النواة في ذرة العنصر المتعادلة تكون:", options: ["موجبة وتساوي شحنة الإلكترونات", "سالبة وتساوي شحنة الإلكترونات", "متعادلة وتساوي صفراً", "ضعف شحنة الإلكترونات"], correct: 0 },
+      { q: "لكي ينتقل الإلكترون من المستوى الرابع (N) إلى المستوى الأول (K) فإنه:", options: ["يشع كماً من الطاقة", "يمتص كماً من الطاقة", "يكتسب شحنة سالبة", "يفقد كتلته"], correct: 0 },
+      { q: "اتفق كل من نموذجي طومسون ورذرفورد في أن الذرة:", options: ["متعادلة كهربياً", "معظمها فراغ", "تحتوي على نواة مركزية", "كرة مصمتة"], correct: 0 }
+    ],
+
+    // المستوى الثاني: الدرس الثاني (النظرية الذرية الحديثة وأعداد الكم)
+    2: [
+      { q: "صاحب فرضية الطبيعة المزدوجة للإلكترون هو العالم:", options: ["دي برولي", "هايزنبرج", "شرودنجر", "بور"], correct: 0 },
+      { q: "تنص الطبيعة المزدوجة للإلكترون على أنه:", options: ["جسيم مادي له خواص موجية", "جسيم مادي ليس له موجات", "موجة كهرومغناطيسية نقية", "شحنة بدون كتلة"], correct: 0 },
+      { q: "ينص مبدأ عدم التأكد لهايزنبرج على أنه:", options: ["يستحيل عملياً تحديد مكان وسرعة الإلكترون معاً بدقة", "لا يتفق إلكترونان في نفس أعداد الكم الأربعة", "تتحرك الإلكترونات في مسارات ثابتة محددة", "توزع الإلكترونات فرادى أولاً"], correct: 0 },
+      { q: "تمكن العالم النمساوي شرودنجر من تأسيس:", options: ["النظرية الميكانيكية الموجية للذرة", "النموذج الكروي المصمت للذرة", "قانون النسب العددية الثابتة", "تجربة صفيحة الذهب"], correct: 0 },
+      { q: "مناطق الفراغ المحيط بالنواة ويحتمل وجود الإلكترون فيها في كل الاتجاهات تسمى:", options: ["السحابة الإلكترونية", "المدار المحدد", "النواة الذرية", "مستوى التكافؤ"], correct: 0 },
+      { q: "المناطق داخل السحابة الإلكترونية التي يزداد ويعلو فيها احتمال تواجد الإلكترون تسمى:", options: ["الأوربيتالات", "المدارات الدائرية", "الحواجز النووية", "المستويات المحرمة"], correct: 0 },
+      { q: "الحل الرياضي للمعادلة الموجية لشرودنجر نتج عنه تحديد:", options: ["أعداد الكم الأربعة", "كتلة البروتون", "شحنة جسيمات ألفا", "شحنة النواة فقط"], correct: 0 },
+      { q: "عدد الكم الذي يصف رتبة المستوى وبعد الإلكترون عن النواة هو:", options: ["الرئيسي", "الثانوي", "المغناطيسي", "المغزلي"], correct: 0 },
+      { q: "قيم عدد الكم الرئيسي (n) تأخذ دائماً:", options: ["أعداداً صحيحة موجبة", "أعداداً سالبة وموجبة", "قيماً كسرية وعشرية", "أرقاماً تبدأ من الصفر"], correct: 0 },
+      { q: "أقصى عدد لمستويات الطاقة الرئيسية في أثقل الذرات في الحالة المستقرة هو:", options: ["7", "4", "8", "32"], correct: 0 },
+      { q: "تحسب السعة القصوى من الإلكترونات للمستويات الرئيسية الأربعة الأولى من العلاقة:", options: ["2n²", "n²", "2l + 1", "4l + 2"], correct: 0 },
+      { q: "يتشبع مستوى الطاقة الرئيسي الثالث (M) بعدد من الإلكترونات قدره:", options: ["18 إلكتروناً", "8 إلكترونات", "32 إلكتروناً", "10 إلكترونات"], correct: 0 },
+      { q: "لا تنطبق العلاقة (2n²) على مستويات الطاقة الأعلى من الرابع لأن الذرة تصبح:", options: ["غير مستقرة", "خاملة كيميائياً", "مشعة ذاتياً", "متأينة تماماً"], correct: 0 },
+      { q: "عدد الكم الذي يحدد مستويات الطاقة الفرعية وأشكال سحابتها هو:", options: ["الثانوي", "الرئيسي", "المغناطيسي", "المغزلي"], correct: 0 },
+      { q: "عدد مستويات الطاقة الفرعية داخل أي مستوى رئيسي يساوي:", options: ["n", "n²", "2n", "2l + 1"], correct: 0 },
+      { q: "تتراوح قيم عدد الكم الثانوي (l) لأي مستوى رئيسي من:", options: ["0 إلى (n - 1)", "-l إلى +l", "1 إلى n", "-1/2 إلى +1/2"], correct: 0 },
+      { q: "المستوى الفرعي الذي له قيمة عدد كم ثانوي l = 0 يرمز له بالرمز:", options: ["s", "p", "d", "f"], correct: 0 },
+      { q: "قيمة عدد الكم الثانوي (l) للمستوى الفرعي (d) تساوي:", options: ["2", "0", "1", "3"], correct: 0 },
+      { q: "قيمة عدد الكم الثانوي (l) للمستوى الفرعي (f) تساوي:", options: ["3", "1", "2", "4"], correct: 0 },
+      { q: "أي المستويات الفرعية الآتية مستحيل وجوده في الذرة نظرياً وعملياً؟", options: ["1p", "2p", "3d", "4f"], correct: 0 },
+      { q: "ترتيب المستويات الفرعية داخل المستوى الرئيسي الواحد من حيث الطاقة هو:", options: ["f > d > p > s", "s > p > d > f", "p > s > d > f", "f = d = p = s"], correct: 0 },
+      { q: "المستوى الرئيسي الثاني (L) يتكون من المستويات الفرعية:", options: ["2s, 2p", "2s فقط", "2s, 2p, 2d", "1s, 2s"], correct: 0 },
+      { q: "المستوى الرئيسي الرابع (N) يحتوي على كم مستوى فرعي؟", options: ["4", "3", "16", "2"], correct: 0 },
+      { q: "عدد الكم الذي يحدد عدد الأوربيتالات واتجاهاتها الفراغية هو:", options: ["المغناطيسي", "الرئيسي", "الثانوي", "المغزلي"], correct: 0 },
+      { q: "يحدد عدد الأوربيتالات في أي مستوى طاقة فرعي من العلاقة:", options: ["2l + 1", "n²", "2n²", "4l + 2"], correct: 0 },
+      { q: "عدد الأوربيتالات في أي مستوى طاقة رئيسي يحسب من العلاقة:", options: ["n²", "2n²", "2l + 1", "l + 1"], correct: 0 },
+      { q: "عدد الأوربيتالات في المستوى الرئيسي الثالث (M) يساوي:", options: ["9", "3", "6", "18"], correct: 0 },
+      { q: "عدد أوربيتالات المستوى الفرعي (p) يساوي:", options: ["3", "1", "5", "7"], correct: 0 },
+      { q: "عدد أوربيتالات المستوى الفرعي (d) يساوي:", options: ["5", "3", "7", "10"], correct: 0 },
+      { q: "عدد أوربيتالات المستوى الفرعي (f) يساوي:", options: ["7", "5", "9", "14"], correct: 0 },
+      { q: "تتراوح قيم عدد الكم المغناطيسي (ml) للمستوى الفرعي بين:", options: ["-l إلى +l", "0 إلى (n-1)", "1 إلى 7", "-1/2 إلى +1/2"], correct: 0 },
+      { q: "عندما تكون قيمة l = 1 فإن القيم المحتملة لعدد الكم المغناطيسي (ml) هي:", options: ["-1 , 0 , +1", "0 فقط", "-2 , -1 , 0 , +1 , +2", "+1 , -1 فقط"], correct: 0 },
+      { q: "الشكل الفراغي لأوربيتال المستوى الفرعي (s) عبارة عن:", options: ["كروي متماثل حول النواة", "كمثرتين متقابلتين بالرأس", "شكل معقد متعدد الفصوص", "حلقة بيضاوية مفرغة"], correct: 0 },
+      { q: "أوربيتالات المستوى الفرعي (p) تأخذ شكلاً فراغياً يمثل:", options: ["كمثرتين متقابلتين بالرأس", "كرة مصمتة متجانسة", "أشكال فراغية معقدة جداً", "خطوط متوازية مستقيمة"], correct: 0 },
+      { q: "تتعامد أوربيتالات المستوى الفرعي (p) على بعضها وتأخذ الاتجاهات:", options: ["px , py , pz", "s , p , d", "x , y فقط", "xy , yz , xz"], correct: 0 },
+      { q: "أوربيتالات المستوى الفرعي الواحد (مثل 2px, 2py, 2pz) تكون:", options: ["متساوية في الطاقة ومختلفة في الاتجاه", "مختلفة في الطاقة والشكل", "مختلفة في عدد الكم الرئيسي", "مختلفة في السعة القصوى"], correct: 0 },
+      { q: "السعة القصوى لأي أوربيتال مفرد في الذرة تساوي:", options: ["2 إلكترون", "1 إلكترون", "6 إلكترونات", "10 إلكترونات"], correct: 0 },
+      { q: "السعة الإلكترونية القصوى لتشبع المستوى الفرعي (p) هي:", options: ["6 إلكترونات", "2 إلكترون", "10 إلكترونات", "14 إلكتروناً"], correct: 0 },
+      { q: "السعة الإلكترونية القصوى لتشبع المستوى الفرعي (d) هي:", options: ["10 إلكترونات", "5 إلكترونات", "14 إلكتروناً", "6 إلكترونات"], correct: 0 },
+      { q: "السعة الإلكترونية القصوى لتشبع المستوى الفرعي (f) هي:", options: ["14 إلكتروناً", "7 إلكترونات", "10 إلكترونات", "18 إلكتروناً"], correct: 0 },
+      { q: "عدد الكم الذي يحدد نوع حركة الإلكترون حول محوره داخل الأوربيتال هو:", options: ["المغزلي", "المغناطيسي", "الثانوي", "الرئيسي"], correct: 0 },
+      { q: "يأخذ عدد الكم المغزلي (ms) قيمتين فقط هما:", options: ["+1/2 و -1/2", "+1 و -1", "0 و 1", "+2 و -2"], correct: 0 },
+      { q: "إذا كان غزل الإلكترون حول محوره في اتجاه عقارب الساعة فإن قيمة ms له تكون:", options: ["+1/2", "-1/2", "0", "+1"], correct: 0 },
+      { q: "لا يتنافر إلكترونا الأوربيتال الواحد بسبب:", options: ["تعاكس اتجاه مجاليهما المغناطيسيين", "وجود شحنة موجبة عازلة بينهما", "صغر كتلتهما", "دورانهما في نفس الاتجاه"], correct: 0 },
+      { q: "أي احتمالات أعداد الكم الآتية مستحيل علمياً وغير صحيح؟", options: ["n = 1 , l = 1 , ml = 0 , ms = +1/2", "n = 2 , l = 1 , ml = -1 , ms = -1/2", "n = 3 , l = 2 , ml = +2 , ms = +1/2", "n = 4 , l = 0 , ml = 0 , ms = -1/2"], correct: 0 },
+      { q: "عندما يكون عدد الكم الرئيسي n = 3 فإن أقصى قيمة محتملة لـ (ml) هي:", options: ["+2", "+3", "+1", "0"], correct: 0 },
+      { q: "إلكترون يقع في المستوى الفرعي (3p)، أي قيم (ml) الآتية غير محتملة له؟", options: ["+2", "-1", "0", "+1"], correct: 0 },
+      { q: "يختلف الأوربيتال (1s) عن الأوربيتال (2s) في:", options: ["الحجم والطاقة", "الشكل الفراغي", "السعة القصوى", "قيمة عدد الكم الثانوي"], correct: 0 },
+      { q: "النسبة بين عدد أوربيتالات المستوى الفرعي p إلى أوربيتالات المستوى الفرعي d هي:", options: ["3 : 5", "1 : 2", "1 : 3", "5 : 7"], correct: 0 },
+      { q: "إلكترونان يشغلان نفس الأوربيتال في ذرة ما، يختلفان في:", options: ["عدد الكم المغزلي", "عدد الكم الرئيسي", "عدد الكم الثانوي", "عدد الكم المغناطيسي"], correct: 0 }
+    ],
+
+    // المستوى الثالث: الدرس الثالث (قواعد توزيع الإلكترونات)
+    3: [
+      { q: "ينص مبدأ الاستبعاد لباولي على أنه في نفس الذرة:", options: ["لا يتفق إلكترونان في أعداد الكم الأربعة", "تملأ المستويات المنخفضة في الطاقة أولاً", "توزع الإلكترونات فرادى أولاً", "يستحيل معرفة مكان وسرعة الإلكترون معاً"], correct: 0 },
+      { q: "ينص مبدأ البناء التصاعدي على أنه لابد للإلكترونات أن تملأ:", options: ["المستويات الفرعية الأقل طاقة أولاً", "المستويات الرئيسية بالكامل تباعاً", "الأوربيتالات بزوج من الإلكترونات أولاً", "المستويات الأبعد عن النواة أولاً"], correct: 0 },
+      { q: "يتم ترتيب المستويات الفرعية تصاعدياً حسب طاقتها بناءً على قيمة:", options: ["(n + l)", "n فقط", "l فقط", "ml"], correct: 0 },
+      { q: "يملأ المستوى الفرعي (4s) بالإلكترونات قبل المستوى الفرعي (3d) لأن:", options: ["طاقة 4s أقل من 3d", "أوربيتالات 4s أكثر من 3d", "قيمة n للمستوى 4s أكبر", "سعة المستوى 4s الإلكترونية أعلى"], correct: 0 },
+      { q: "عند تساوي مجموع (n+l) لمستويين فرعيين فإن الأقل طاقة هو:", options: ["الأقل في قيمة n", "الأكبر في قيمة n", "الأكبر في قيمة l", "الأقل في عدد الإلكترونات"], correct: 0 },
+      { q: "مجموع قيمتي (n + l) للمستوى الفرعي (3d) يساوي:", options: ["5", "4", "3", "6"], correct: 0 },
+      { q: "مجموع قيمتي (n + l) للمستوى الفرعي (4s) يساوي:", options: ["4", "5", "3", "2"], correct: 0 },
+      { q: "الترتيب التصاعدي الصحيح للمستويات الفرعية حسب طاقتها هو:", options: ["1s < 2s < 2p < 3s < 3p < 4s < 3d", "1s < 2s < 3s < 2p < 3p < 3d < 4s", "1s < 2s < 2p < 3s < 3d < 3p < 4s", "1s < 2s < 2p < 3s < 4s < 3p < 3d"], correct: 0 },
+      { q: "تنص قاعدة هوند على أنه لا يحدث ازدواج بين إلكترونين في أوربيتال مستوى فرعي إلا بعد أن:", options: ["تشغل أوربيتالاته فرادى أولاً", "يمتلئ المستوى الرئيسي تماماً", "تتساوى قيم أعداد الكم لجميع الإلكترونات", "يتحول الإلكترون لحالة مثارة"], correct: 0 },
+      { q: "تفضل الإلكترونات أن تشغل أوربيتالات المستوى الفرعي فرادى وبنفس اتجاه الغزل لأن ذلك:", options: ["يعطي الذرة أكبر استقرار", "يزيد من قوى التنافر", "يجعل الإلكترون يفقد كتلته", "يضاعف سرعة دورانه"], correct: 0 },
+      { q: "يفضل الإلكترون أن يزدوج في نفس المستوى الفرعي على الانتقال للمستوى التالي لأن ذلك:", options: ["أفضل من جهة الطاقة", "يغير شحنة الإلكترون", "يلغي مجال النواة", "يقلل عدد الإلكترونات"], correct: 0 },
+      { q: "التوزيع الإلكتروني لذرة النيتروجين (7N) ينتهي بالمستوى الفرعي:", options: ["2p³", "2p²", "2p⁴", "3s¹"], correct: 0 },
+      { q: "عدد الإلكترونات المفردة في ذرة النيتروجين (7N) طبقاً لقاعدة هوند هو:", options: ["3", "1", "2", "صفر"], correct: 0 },
+      { q: "عدد الإلكترونات المفردة في ذرة الأكسجين (8O) هو:", options: ["2", "1", "3", "4"], correct: 0 },
+      { q: "عدد الأوربيتالات نصف الممتلئة بالإلكترونات في ذرة الكربون (6C) في الحالة المستقرة هو:", options: ["2", "1", "3", "4"], correct: 0 },
+      { q: "التوزيع الإلكتروني الصحيح لذرة الصوديوم (11Na) هو:", options: ["1s² , 2s² 2p⁶ , 3s¹", "1s² , 2s² 2p⁵ , 3s²", "1s² , 2s² 2p⁷", "1s² , 2s¹ 2p⁶ , 3s²"], correct: 0 },
+      { q: "التوزيع الإلكتروني الصحيح لذرة الكالسيوم (20Ca) هو:", options: ["1s² 2s² 2p⁶ 3s² 3p⁶ 4s²", "1s² 2s² 2p⁶ 3s² 3p⁶ 3d²", "1s² 2s² 2p⁶ 3s² 3d⁸", "1s² 2s² 2p⁶ 4s² 3p⁶"], correct: 0 },
+      { q: "أعداد الكم الأربعة للإلكترون الأخير في ذرة الصوديوم (11Na) هي:", options: ["n = 3 , l = 0 , ml = 0 , ms = +1/2", "n = 3 , l = 1 , ml = 0 , ms = +1/2", "n = 2 , l = 1 , ml = +1 , ms = -1/2", "n = 3 , l = 0 , ml = 1 , ms = -1/2"], correct: 0 },
+      { q: "أعداد الكم الأربعة للإلكترون الثاني في ذرة الهيليوم (2He) هي:", options: ["n = 1 , l = 0 , ml = 0 , ms = -1/2", "n = 1 , l = 0 , ml = 0 , ms = +1/2", "n = 1 , l = 1 , ml = 0 , ms = -1/2", "n = 2 , l = 0 , ml = 0 , ms = -1/2"], correct: 0 },
+      { q: "يتفق إلكترونا ذرة الهيليوم المستقرة في ثلاثة أعداد كم ويختلفان في:", options: ["المغزلي", "الرئيسي", "الثانوي", "المغناطيسي"], correct: 0 },
+      { q: "عنصر السكانديوم (21Sc) ينتهي توزيعه الإلكتروني بالمستويين الفرعيين:", options: ["4s² , 3d¹", "4s¹ , 3d²", "3d³", "4p¹"], correct: 0 },
+      { q: "عند تأين ذرة السكانديوم (21Sc) تفقد إلكتروناتها أولاً من المستوى الفرعي:", options: ["4s", "3d", "3p", "3s"], correct: 0 },
+      { q: "في ذرة المنجنيز (25Mn)، الإلكترون الأعلى طاقة في الذرة يقع في المستوى الفرعي:", options: ["3d", "4s", "3p", "4p"], correct: 0 },
+      { q: "عدد الإلكترونات المفردة في ذرة عنصر المنجنيز (25Mn) يساوي:", options: ["5", "2", "3", "صفر"], correct: 0 },
+      { q: "التوزيع الإلكتروني لعنصر الخارصين (30Zn) ينتهي بـ:", options: ["4s² , 3d¹⁰", "4s¹ , 3d⁹", "4p²", "3d⁸ , 4s²"], correct: 0 },
+      { q: "عدد الأوربيتالات الممتلئة تماماً بالإلكترونات في ذرة الخارصين (30Zn) هو:", options: ["15", "10", "12", "30"], correct: 0 },
+      { q: "عدد الإلكترونات التي لها عدد كم مغزلي ms = +1/2 في ذرة الصوديوم (11Na) المستقرة هو:", options: ["6", "5", "7", "11"], correct: 0 },
+      { q: "التوزيع الإلكتروني لأيون الأكسيد (8O²⁻) يماثل التوزيع الإلكتروني لذرة:", options: ["النيون", "الهيليوم", "الأرجون", "الكربون"], correct: 0 },
+      { q: "عدد الأوربيتالات التامة الامتلاء في ذرة غاز النيون (10Ne) يساوي:", options: ["5", "3", "10", "4"], correct: 0 },
+      { q: "الإلكترون الأخير الأعلى طاقة في ذرة الكلور (17Cl) يقع في الأوربيتال:", options: ["3py", "3s", "3pz", "4s"], correct: 0 },
+      { q: "أعداد الكم للإلكترون الأخير في ذرة الفلور (9F) هي:", options: ["n = 2 , l = 1 , ml = 0 , ms = -1/2", "n = 2 , l = 1 , ml = +1 , ms = -1/2", "n = 2 , l = 0 , ml = 0 , ms = +1/2", "n = 3 , l = 1 , ml = -1 , ms = -1/2"], correct: 0 },
+      { q: "عنصر يحتوي في ذرته على 3 مستويات طاقة رئيسية ممتلئة تماماً، عدده الذري لا يقل عن:", options: ["30", "18", "28", "10"], correct: 0 },
+      { q: "عدد الأوربيتالات نصف الممتلئة في ذرة الفوسفور (15P) يساوي:", options: ["3", "1", "2", "صفر"], correct: 0 },
+      { q: "التوزيع الإلكتروني الذي ينتهي بـ (2px² , 2py¹ , 2pz⁰) يعتبر مخالفاً لـ:", options: ["قاعدة هوند", "مبدأ الاستبعاد لباولي", "مبدأ البناء التصاعدي", "قوانين كولوم"], correct: 0 },
+      { q: "ذرة عنصر ينتهي توزيعها الإلكتروني بالمستوى الفرعي (3p⁴)، عدد إلكتروناتها المفردة:", options: ["2", "4", "1", "3"], correct: 0 },
+      { q: "التوزيع الإلكتروني لأيون الحديد (26Fe²⁺) ينتهي بالمستويين الفرعيين:", options: ["4s⁰ , 3d⁶", "4s² , 3d⁴", "4s¹ , 3d⁵", "3d⁵"], correct: 0 },
+      { q: "عدد الأوربيتالات المشغولة بالإلكترونات في ذرة البورون (5B) يساوي:", options: ["3", "2", "5", "1"], correct: 0 },
+      { q: "أقصى عدد من الإلكترونات في ذرة يمكن أن تمتلك أعداد الكم n = 3 , l = 1 هو:", options: ["6", "2", "10", "18"], correct: 0 },
+      { q: "أقصى عدد من الإلكترونات في الذرة يمكن أن يمتلك أعداد الكم n = 4 , l = 2 , ml = 0 هو:", options: ["2", "1", "10", "14"], correct: 0 },
+      { q: "عنصر ينتهي توزيعه الإلكتروني بالمستوى الفرعي (4p²)، يكون عدده الذري:", options: ["32", "22", "34", "14"], correct: 0 },
+      { q: "عند ملء أوربيتالات المستوى الفرعي (3d) بالإلكترونات يبدأ الازدواج عند الإلكترون رقم:", options: ["6", "5", "4", "7"], correct: 0 },
+      { q: "أعداد الكم: n = 4 , l = 0 , ml = 0 , ms = +1/2 تعبر عن الإلكترون في المستوى الفرعي:", options: ["4s", "4p", "3d", "4d"], correct: 0 },
+      { q: "عدد الإلكترونات التي تمتلك عدد كم ثانوي l = 0 في ذرة الماغنسيوم (12Mg) هو:", options: ["6", "2", "4", "12"], correct: 0 },
+      { q: "عدد الإلكترونات التي تمتلك عدد كم ثانوي l = 1 في ذرة الكبريت (16S) هو:", options: ["10", "6", "4", "12"], correct: 0 },
+      { q: "ما عدد الأوربيتالات التي يكون مجموع (n + l) لها أقل من 5 في أي ذرة؟", options: ["9 أوربيتالات", "5 أوربيتالات", "8 أوربيتالات", "12 أوربيتالاً"], correct: 0 },
+      { q: "عنصر ينتهي توزيعه بـ 3d ويحتوي على 3 إلكترونات مفردة فقط، عدده الذري قد يكون:", options: ["23", "21", "25", "28"], correct: 0 },
+      { q: "أي الذرات الآتية يتساوى فيها عدد الأوربيتالات الممتلئة مع الأوربيتالات نصف الممتلئة؟", options: ["الكربون 6C", "الأكسجين 8O", "النيتروجين 7N", "البريليوم 4Be"], correct: 0 },
+      { q: "تتساوى الطاقة تماماً بين أوربيتالين في نفس الذرة عندما يكونان:", options: ["2px و 2py", "2s و 2px", "3s و 4s", "3d و 4s"], correct: 0 },
+      { q: "إذا تواجد إلكترونان في ذرة لهما نفس قيم n=2, l=1, ml=-1 فلابد أن يختلفا في قيمة:", options: ["ms", "n", "l", "ml"], correct: 0 },
+      { q: "طاقة إلكترون في المستوى الفرعي (4d) مقارنة بإلكترون في المستوى الفرعي (5s):", options: ["4d أعلى طاقة", "5s أعلى طاقة", "متساويان في الطاقة", "لا يمكن المقارنة"], correct: 0 }
+    ]
+  };
+
+  const moralAdvices = [
+    "«التواضع عند الفهم وحسن الخلق مع الزملاء والمعلمين زكاة العلم الحقيقية.»",
+    "«من سلك طريقاً يلتمس فيه علماً سهل الله له به طريقاً إلى الجنة.»",
+    "«بر الوالدين ودعاؤهما هو السر الخفي في كل توفيق وفهم وتفوق كيميائي.»",
+    "«اجعل نيتك في المذاكرة نفع الأمة وعمارة الأرض لتؤجر على كل دقيقة تبذلها.»"
+  ];
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playWrongSound() {
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(70, audioCtx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.35);
+    } catch(e) {}
+  }
+
+  function playCorrectSound() {
+    try {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(840, audioCtx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.2);
+    } catch(e) {}
+  }
+
+  let currentLevel = 1;
+  const maxLevels = 3;
+  const QUESTIONS_PER_LEVEL = 10;
+  let score = 0;
+  let hearts = 10;
+  const maxHearts = 12;
+  let consecutiveCorrect = 0;
+  let skipsLeft = 3;
+  let playerName = "بطل الكيمياء";
+  
+  let speedDuration = 16000;
+
+  let activeQuestionsQueue = [];
+  let currentQIndex = 0;
+  let currentQ = null;
+  let animationFrameId = null;
+  let isAnswerLocked = false;
+  let currentBalloonElements = [];
+
+  let isPaused = false;
+  let animStartTime = null;
+  let animElapsedBeforePause = 0;
+
+  const balloonColors = ["#16a34a", "#ea580c", "#0284c7", "#d97706", "#7c3aed"];
+
+  function setAppTheme(theme) {
+    document.body.classList.toggle('light-mode', theme === 'light');
+    document.getElementById('mode-dark-btn').classList.toggle('active', theme === 'dark');
+    document.getElementById('mode-light-btn').classList.toggle('active', theme === 'light');
+    document.getElementById('theme-btn').innerText = theme === 'light' ? '🌙 ليل' : '☀️ نهار';
+  }
+
+  function toggleTheme() {
+    const isLight = document.body.classList.contains('light-mode');
+    setAppTheme(isLight ? 'dark' : 'light');
+  }
+
+  function setGameSpeed(speed) {
+    document.getElementById('speed-slow-btn').classList.toggle('active', speed === 'slow');
+    document.getElementById('speed-med-btn').classList.toggle('active', speed === 'med');
+    document.getElementById('speed-fast-btn').classList.toggle('active', speed === 'fast');
+    
+    if (speed === 'slow') {
+      speedDuration = 16000;
+      document.getElementById('speed-indicator').innerText = "⚡ سرعة: هادئ جداً";
+    } else if (speed === 'med') {
+      speedDuration = 12000;
+      document.getElementById('speed-indicator').innerText = "⚡ سرعة: متوسط";
+    } else {
+      speedDuration = 8000;
+      document.getElementById('speed-indicator').innerText = "⚡ سرعة: سريع";
+    }
+  }
+
+  function togglePause() {
+    if (isAnswerLocked) return;
+    const pauseBtn = document.getElementById('pause-btn');
+    
+    isPaused = !isPaused;
+    if (isPaused) {
+      pauseBtn.innerText = "▶️ استئناف";
+      pauseBtn.classList.add('paused');
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    } else {
+      pauseBtn.innerText = "⏸️ إيقاف";
+      pauseBtn.classList.remove('paused');
+      animStartTime = performance.now() - animElapsedBeforePause;
+      animationFrameId = requestAnimationFrame(stepBalloonAnimation);
+    }
+  }
+
+  function shuffle(array) {
+    return [...array].sort(() => Math.random() - 0.5);
+  }
+
+  function showPreloaderScreen() {
+    const nameInput = document.getElementById('player-name-input').value.trim();
+    if (nameInput) playerName = nameInput;
+
+    document.getElementById('start-screen').classList.add('hidden');
+    const prepScreen = document.getElementById('prep-screen');
+    prepScreen.classList.remove('hidden');
+
+    const advice = moralAdvices[Math.floor(Math.random() * moralAdvices.length)];
+    document.getElementById('advice-text').innerText = advice;
+    document.getElementById('prep-title').innerText = `المستوى ${currentLevel} يبدأ الآن...`;
+
+    setTimeout(() => {
+      prepScreen.classList.add('hidden');
+      initGame();
+    }, 2800);
+  }
+
+  function initGame() {
+    score = 0;
+    hearts = 10;
+    consecutiveCorrect = 0;
+    skipsLeft = 3;
+    currentLevel = 1;
+    startLevel(currentLevel);
+  }
+
+  function startLevel(lvl) {
+    currentLevel = lvl;
+    currentQIndex = 0;
+    isPaused = false;
+    const pauseBtn = document.getElementById('pause-btn');
+    pauseBtn.innerText = "⏸️ إيقاف";
+    pauseBtn.classList.remove('paused');
+
+    const fullLevelPool = levelQuestionsBank[currentLevel] || levelQuestionsBank[1];
+    activeQuestionsQueue = shuffle(fullLevelPool).slice(0, QUESTIONS_PER_LEVEL);
+
+    loadQuestion();
+  }
+
+  function updateHUD() {
+    document.getElementById('level-display').innerText = `${currentLevel} / ${maxLevels}`;
+    document.getElementById('score-display').innerText = score;
+    document.getElementById('hearts-count-num').innerText = hearts;
+    document.getElementById('hearts-display').innerText = '❤️'.repeat(Math.max(0, hearts));
+    document.getElementById('skip-num').innerText = skipsLeft;
+    document.getElementById('q-number-badge').innerText = `سؤال ${currentQIndex + 1} / ${QUESTIONS_PER_LEVEL}`;
+  }
+
+  function loadQuestion() {
+    clearStage();
+    isAnswerLocked = false;
+    isPaused = false;
+    const pauseBtn = document.getElementById('pause-btn');
+    pauseBtn.innerText = "⏸️ إيقاف";
+    pauseBtn.classList.remove('paused');
+
+    if (hearts <= 0) {
+      endGame(false, "نفدت القلوب لديك!");
+      return;
+    }
+
+    if (currentQIndex >= QUESTIONS_PER_LEVEL) {
+      handleLevelCompletion();
+      return;
+    }
+
+    currentQ = activeQuestionsQueue[currentQIndex];
+    document.getElementById('question-text').innerHTML = currentQ.q;
+    updateHUD();
+
+    spawnBalloons(currentQ);
+  }
+
+  function clearStage() {
+    const stage = document.getElementById('game-stage');
+    stage.innerHTML = '';
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    currentBalloonElements = [];
+    animStartTime = null;
+    animElapsedBeforePause = 0;
+  }
+
+  function spawnBalloons(q) {
+    const stage = document.getElementById('game-stage');
+    const stageWidth = stage.clientWidth || 360;
+
+    const optionsData = q.options.map((opt, idx) => ({
+      text: opt,
+      isCorrect: idx === q.correct
+    }));
+
+    const shuffledOpts = shuffle(optionsData);
+    const count = shuffledOpts.length;
+    const colWidth = stageWidth / count;
+
+    currentBalloonElements = [];
+
+    shuffledOpts.forEach((opt, i) => {
+      const balloon = document.createElement('div');
+      balloon.className = 'balloon';
+      
+      const content = document.createElement('div');
+      content.className = 'balloon-content';
+      content.innerHTML = opt.text;
+      balloon.appendChild(content);
+
+      balloon.style.backgroundColor = balloonColors[i % balloonColors.length];
+
+      const leftPos = Math.max(6, Math.min(stageWidth - 106, (i * colWidth) + ((colWidth - 100) / 2)));
+      balloon.style.left = `${leftPos}px`;
+      
+      balloon.onclick = () => onBalloonClick(opt.isCorrect, balloon);
+
+      stage.appendChild(balloon);
+      currentBalloonElements.push({ el: balloon, isCorrect: opt.isCorrect, offsetDelay: (i % 2) * 16 });
+    });
+
+    animStartTime = null;
+    animElapsedBeforePause = 0;
+    animationFrameId = requestAnimationFrame(stepBalloonAnimation);
+  }
+
+  function stepBalloonAnimation(timestamp) {
+    if (isAnswerLocked || isPaused) return;
+    if (!animStartTime) animStartTime = timestamp;
+    
+    const elapsed = timestamp - animStartTime;
+    animElapsedBeforePause = elapsed;
+    const progress = elapsed / speedDuration;
+
+    const stage = document.getElementById('game-stage');
+    const stageHeight = stage.clientHeight || 450;
+
+    if (progress < 1) {
+      const currentY = stageHeight - (progress * (stageHeight + 140));
+      currentBalloonElements.forEach(b => {
+        b.el.style.top = `${currentY + b.offsetDelay}px`;
+      });
+      animationFrameId = requestAnimationFrame(stepBalloonAnimation);
+    } else {
+      onMissedBalloons();
+    }
+  }
+
+  function onBalloonClick(isCorrect, element) {
+    if (isAnswerLocked || isPaused) return;
+    isAnswerLocked = true;
+    cancelAnimationFrame(animationFrameId);
+
+    if (isCorrect) {
+      playCorrectSound();
+      element.style.transform = 'scale(1.35)';
+      element.style.opacity = '0';
+      handleAnswer(true, 500);
+    } else {
+      playWrongSound();
+      element.style.opacity = '0.3';
+      bringCorrectToCenter();
+      handleAnswer(false, 1800);
+    }
+  }
+
+  function onMissedBalloons() {
+    if (isAnswerLocked || isPaused) return;
+    isAnswerLocked = true;
+    cancelAnimationFrame(animationFrameId);
+
+    playWrongSound();
+    bringCorrectToCenter();
+    handleAnswer(false, 1800);
+  }
+
+  function bringCorrectToCenter() {
+    currentBalloonElements.forEach(b => {
+      if (b.isCorrect) {
+        b.el.classList.add('highlight-correct', 'center-focus');
+      } else {
+        b.el.classList.add('fade-out');
+      }
+    });
+  }
+
+  function handleAnswer(isCorrect, delay) {
+    if (isCorrect) {
+      score += 10;
+      consecutiveCorrect++;
+      flashQuestionBox(true);
+
+      if (consecutiveCorrect === 4) {
+        if (hearts < maxHearts) hearts++;
+        consecutiveCorrect = 0;
+      }
+    } else {
+      hearts--;
+      consecutiveCorrect = 0;
+      flashQuestionBox(false);
+    }
+
+    updateHUD();
+
+    setTimeout(() => {
+      if (hearts <= 0) {
+        endGame(false, "نفدت القلوب لديك!");
+      } else {
+        currentQIndex++;
+        loadQuestion();
+      }
+    }, delay);
+  }
+
+  function flashQuestionBox(correct) {
+    const box = document.getElementById('question-box');
+    box.style.borderColor = correct ? '#16a34a' : '#ef4444';
+    setTimeout(() => {
+      box.style.borderColor = 'var(--accent)';
+    }, 600);
+  }
+
+  function skipQuestion() {
+    if (skipsLeft > 0 && !isAnswerLocked && !isPaused) {
+      skipsLeft--;
+      clearStage();
+      currentQIndex++;
+      loadQuestion();
+    }
+  }
+
+  function handleLevelCompletion() {
+    clearStage();
+
+    if (currentLevel < maxLevels) {
+      const passedScreen = document.getElementById('level-passed-screen');
+      const passedTitle = document.getElementById('level-passed-title');
+      const passedMsg = document.getElementById('level-passed-msg');
+      const passedScore = document.getElementById('level-passed-score');
+      const nextBtn = document.getElementById('next-level-btn');
+
+      passedScore.innerText = score;
+      passedTitle.innerText = `عاش يا بطل! أنهيت المستوى ${currentLevel} 🌟`;
+      
+      const praiseWords = [
+        `أداء مبهر وإتقان كيميائي متميز يا (${playerName})! مستعد لتحدي الدرس القادم؟`,
+        `ما شاء الله عليك يا (${playerName})! تركيزك عالي وفهمك لبنية الذرة ممتاز جداً!`,
+        `ممتاز يا عبقري الكيمياء (${playerName})! خطوة ثابتة وممتازة نحو التفوق الكامل!`
+      ];
+      passedMsg.innerText = praiseWords[currentLevel - 1] || praiseWords[0];
+      nextBtn.innerText = `الانتقال للمستوى ${currentLevel + 1} (الدرس التالي) 🚀`;
+
+      passedScreen.classList.remove('hidden');
+    } else {
+      endGame(true, "مبارك يا دكتور! أتممت جميع مستويات الباب الثاني بنجاح 🎓🏆");
+    }
+  }
+
+  function replayCurrentLevel() {
+    document.getElementById('level-passed-screen').classList.add('hidden');
+    const prepScreen = document.getElementById('prep-screen');
+    prepScreen.classList.remove('hidden');
+
+    const advice = moralAdvices[Math.floor(Math.random() * moralAdvices.length)];
+    document.getElementById('advice-text').innerText = advice;
+    document.getElementById('prep-title').innerText = `إعادة المستوى ${currentLevel} (10 أسئلة جديدة)...`;
+
+    setTimeout(() => {
+      prepScreen.classList.add('hidden');
+      startLevel(currentLevel);
+    }, 2200);
+  }
+
+  function proceedToNextLevel() {
+    document.getElementById('level-passed-screen').classList.add('hidden');
+    const prepScreen = document.getElementById('prep-screen');
+    prepScreen.classList.remove('hidden');
+
+    const advice = moralAdvices[Math.floor(Math.random() * moralAdvices.length)];
+    document.getElementById('advice-text').innerText = advice;
+    document.getElementById('prep-title').innerText = `المستوى ${currentLevel + 1} يبدأ الآن...`;
+
+    setTimeout(() => {
+      prepScreen.classList.add('hidden');
+      startLevel(currentLevel + 1);
+    }, 2500);
+  }
+
+  function shareLevelScore() {
+    const text = `أنهيت المستوى ${currentLevel} في لعبة كيمياء 2 ثانوي (الباب الثاني: بنية الذرة) وحققت ${score} نقطة! 🧪 إعداد أ/ عبد الرحمن عبد الله (01021779644)`;
+    if (navigator.share) {
+      navigator.share({ title: 'نتيجة المستوى في الكيمياء', text: text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text);
+      alert('تم نسخ النتيجة ورسالة المستوى بنجاح!');
+    }
+  }
+
+  function captureLevelScreenshot() {
+    const target = document.getElementById('level-passed-card');
+    html2canvas(target, { backgroundColor: '#111b36', scale: 2 }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `نتيجة_المستوى_${currentLevel}_${playerName}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
+
+  function endGame(isWin, customTitle) {
+    clearStage();
+
+    const endScreen = document.getElementById('end-screen');
+    const endTitle = document.getElementById('end-title');
+    const endPraise = document.getElementById('end-praise');
+    const finalScore = document.getElementById('final-score');
+
+    finalScore.innerText = score;
+    endTitle.innerText = customTitle || "انتهت الجولة!";
+    endTitle.style.color = isWin ? "#16a34a" : "#ef4444";
+
+    if (score >= 250) {
+      endPraise.innerText = `ما شاء الله تبارك الله! قمة التفوق والعبقرية الكيميائية يا (${playerName})! إجاباتك تدل على استيعاب قوي ومتقن لباب بنية الذرة. استمر نحو المركز الأول دائماً! 🌟🏆`;
+    } else if (score >= 150) {
+      endPraise.innerText = `رائع جداً يا (${playerName})! مستواك متميز ومعلوماتك دقيقة وقوية في مفاهيم الذرة وأعداد الكم وقواعد التوزيع. فخور بك يا بطل! 👏🔬`;
+    } else {
+      endPraise.innerText = `محاولة جيدة ومجهود طيب يا (${playerName})! المراجعة والتكرار هما سر التفوق في الكيمياء. أعد المحاولة لتتجاوز هذا السكور! 💪💡`;
+    }
+
+    endScreen.classList.remove('hidden');
+  }
+
+  function restartGame() {
+    document.getElementById('end-screen').classList.add('hidden');
+    document.getElementById('level-passed-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+  }
+
+  function shareFinalScore() {
+    const text = `حققت ${score} من 300 في لعبة كيمياء 2 ثانوي (الباب الثاني: بنية الذرة) - إعداد أ/ عبد الرحمن عبد الله (01021779644)! 🧪 هل تستطيع هزيمتي؟`;
+    if (navigator.share) {
+      navigator.share({
+        title: 'تحدي كيمياء بنية الذرة',
+        text: text,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text);
+      alert('تم نسخ النتيجة ورسالة التحدي بنجاح!');
+    }
+  }
+
+  function captureFinalScreenshot() {
+    const target = document.getElementById('end-card');
+    html2canvas(target, { backgroundColor: '#111b36', scale: 2 }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `نتيجة_${playerName}_كيمياء_بنية_الذرة.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  }
+</script>
+
+</body>
+</html>
